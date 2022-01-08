@@ -13,20 +13,31 @@ void UStaminaBar::NativeTick(const FGeometry& MovieSceneBlends, float InDeltaTim
 	if(Link != nullptr)
 	{
 		UMaterialInstanceDynamic* M_Dynamic = Progress_Image->GetDynamicMaterial();
-
-		
-		FLinearColor Color = FLinearColor::Green;
-		FLinearColor Color2 = FLinearColor::Green;
-
+		/*
 		// 스태미나가 고갈상태라면 빨간색으로 표시
 		if(Link->IsStaminaDepletion() == true)
+		{
 			Color = FLinearColor::Red;
-		// 스태미나를 사용중이라면 끝에 일부분을 빨간색으로 표시
-		if(Link->IsUseStamina() == true)
 			Color2 = FLinearColor::Red;
-		
+		}
+		// 스태미나를 사용중이라면 끝에 일부분을 빨간색으로 표시
+		else if(Link->IsUseStamina() == true)
+			Color2 = FLinearColor::Red;
+		*/
 		M_Dynamic->SetVectorParameterValue(TEXT("Color"),Color);
 		M_Dynamic->SetVectorParameterValue(TEXT("Color2"),Color2);
 		M_Dynamic->SetScalarParameterValue(TEXT("Decimal"),Link->GetStamina() / Link->GetMaxStamina());
 	}
+}
+
+void UStaminaBar::NativeConstruct()
+{
+	Super::NativeConstruct();
+	ALink* sdf = Cast<ALink>(GetOwningPlayerPawn());
+	if(sdf)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Blue, FString::Printf(TEXT("%s"),ToCStr(sdf->GetName())));
+	}
+	
+
 }

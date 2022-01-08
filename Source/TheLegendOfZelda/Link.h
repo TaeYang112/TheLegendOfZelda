@@ -8,9 +8,16 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Link.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class EStaminaState : uint8
+{
+	DEFAULT,
+	USING,
+	DEPLETION
+};
+
+DECLARE_MULTICAST_DELEGATE(FOnStaminaStateChanged);
+
 UCLASS()
 class THELEGENDOFZELDA_API ALink : public ACharacterBase
 {
@@ -19,12 +26,11 @@ class THELEGENDOFZELDA_API ALink : public ACharacterBase
 public:
 	float Stamina;
 	float MaxStamina;
-	bool bStaminaDepletion;
 	bool bRunning;
-	bool bUseStamina;
 	bool bStaminaRegen;
 	FTimerHandle WaitStaminaRegenTimer = {};
-
+	EStaminaState StaminaState;
+	FOnStaminaStateChanged StaminaStateChanged;
 private:
 	UPROPERTY()
 	USpringArmComponent* SpringArm;
@@ -47,8 +53,7 @@ public:
 	
 	float GetStamina() const;
 	float GetMaxStamina() const;
-	bool IsStaminaDepletion() const;
-	void SetUseStamina(bool bUse);
-	bool IsUseStamina() const;
-	void SetStaminaDepletion(bool bDepletion);
+	EStaminaState GetStaminaState() const;
+	void SetStaminaState(EStaminaState NewState);
+
 };
