@@ -2,42 +2,68 @@
 
 
 #include "StaminaBar.h"
-#include "Link.h"
 #include "Components/Image.h"
+
+void UStaminaBar::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	Color = FLinearColor::Green;
+	Color2 = FLinearColor::Green;
+	DepletionColor = FLinearColor::Red;
+	bDepletionColor_incr = true;
+	
+	Link = Cast<ALink>(GetOwningPlayerPawn());
+	if(Link != nullptr)
+	{
+		Link->StaminaStateChanged.AddLambda([this]()->void
+		{
+			StaminaState = Link->GetStaminaState();
+			
+			if(StaminaState == EStaminaState::DEFAULT)
+			{
+				Color = FLinearColor::Green;
+				Color2 = FLinearColor::Green;
+			}
+		});
+	}
+
+	
+
+}
 
 void UStaminaBar::NativeTick(const FGeometry& MovieSceneBlends, float InDeltaTime)
 {
 	Super::NativeTick(MovieSceneBlends, InDeltaTime);
 	
-	ALink* Link = Cast<ALink>(GetOwningPlayerPawn());
 	if(Link != nullptr)
 	{
 		UMaterialInstanceDynamic* M_Dynamic = Progress_Image->GetDynamicMaterial();
-		/*
-		// 스태미나가 고갈상태라면 빨간색으로 표시
-		if(Link->IsStaminaDepletion() == true)
+		
+		if (StaminaState == EStaminaState::DEPLETION)
 		{
-			Color = FLinearColor::Red;
-			Color2 = FLinearColor::Red;
+			Color = DepletionColor;
+			Color2 = DepletionColor;
 		}
-		// 스태미나를 사용중이라면 끝에 일부분을 빨간색으로 표시
-		else if(Link->IsUseStamina() == true)
-			Color2 = FLinearColor::Red;
-		*/
+		else if(StaminaState == EStaminaState::USING)
+		{
+        	Color2 = DepletionColor;
+        }
+
+		if(bDepletionColor_incr)
+		{
+			DepletionColor.G += 0.02;
+			if(DepletionColor.G >= 0.3) bDepletionColor_incr = false;
+		}
+		else
+		{
+			DepletionColor.G -= 0.02;
+			if(DepletionColor.G <= 0) bDepletionColor_incr = true;
+		}
+		
 		M_Dynamic->SetVectorParameterValue(TEXT("Color"),Color);
 		M_Dynamic->SetVectorParameterValue(TEXT("Color2"),Color2);
 		M_Dynamic->SetScalarParameterValue(TEXT("Decimal"),Link->GetStamina() / Link->GetMaxStamina());
 	}
 }
 
-void UStaminaBar::NativeConstruct()
-{
-	Super::NativeConstruct();
-	ALink* sdf = Cast<ALink>(GetOwningPlayerPawn());
-	if(sdf)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Blue, FString::Printf(TEXT("%s"),ToCStr(sdf->GetName())));
-	}
-	
-
-}

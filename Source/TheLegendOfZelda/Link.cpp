@@ -56,8 +56,9 @@ void ALink::Tick(float DeltaSeconds)
 	else if(GetStaminaState() == EStaminaState::USING)
 	{
 		Stamina -= 35 * DeltaSeconds;
-		if(Stamina < 0)
+		if(Stamina <= 0)
 		{
+			Stamina = 0;
 			SetStaminaState(EStaminaState::DEPLETION);
 		}
 	}
@@ -123,15 +124,14 @@ void ALink::SetStaminaState(EStaminaState NewState)
 	switch (StaminaState)
 	{
 	case EStaminaState::DEFAULT :
-		GetWorld()->GetTimerManager().SetTimer(WaitStaminaRegenTimer,
-			FTimerDelegate::CreateLambda([this]() -> void {bStaminaRegen = true;}), 0.5f, false);
+		DoRegen();
 		GetCharacterMovement()->MaxWalkSpeed = 500.0f;
 		break;
 	case EStaminaState::USING :
-		bStaminaRegen = false;
-		GetWorld()->GetTimerManager().ClearTimer(WaitStaminaRegenTimer);
+		StopRegen();
 		break;
-	case EStaminaState::DEPLETION :
+	case EStaminaState::DEPLETION:
+		DoRegen();
 		bRunning = false;
 		GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 		break;
@@ -140,4 +140,14 @@ void ALink::SetStaminaState(EStaminaState NewState)
 	StaminaStateChanged.Broadcast();
 }
 
+void ALink::DoRegen()
+{
+	GetWorld()->GetTimerManager().SetTimer(WaitStaminaRegenTimer,
+			FTimerDelegate::CreateLambda([this]() -> void {bStaminaRegen = true;}), 0.5f, false);
+}
+void ALink::StopRegen()
+{
+	bStaminaRegen = false;
+	GetWorld()->GetTimerManager().ClearTimer(WaitStaminaRegenTimer);
+}
 

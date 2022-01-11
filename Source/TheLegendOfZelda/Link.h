@@ -24,14 +24,16 @@ class THELEGENDOFZELDA_API ALink : public ACharacterBase
 	GENERATED_BODY()
 
 public:
+	
+	FOnStaminaStateChanged StaminaStateChanged;
+private:
 	float Stamina;
 	float MaxStamina;
 	bool bRunning;
 	bool bStaminaRegen;
 	FTimerHandle WaitStaminaRegenTimer = {};
 	EStaminaState StaminaState;
-	FOnStaminaStateChanged StaminaStateChanged;
-private:
+	
 	UPROPERTY()
 	USpringArmComponent* SpringArm;
 
@@ -55,5 +57,6 @@ public:
 	float GetMaxStamina() const;
 	EStaminaState GetStaminaState() const;
 	void SetStaminaState(EStaminaState NewState);
-
+	void DoRegen();
+	void StopRegen();
 };
