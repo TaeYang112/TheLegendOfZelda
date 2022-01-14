@@ -4,15 +4,25 @@
 #include "StaminaBar.h"
 #include "Components/Image.h"
 
-void UStaminaBar::NativeConstruct()
-{
-	Super::NativeConstruct();
 
+void UStaminaBar::NativePreConstruct()
+{
+	Super::NativePreConstruct();
 	Color = FLinearColor::Green;
 	Color2 = FLinearColor::Green;
 	DepletionColor = FLinearColor::Red;
 	bDepletionColor_incr = true;
+	Link = nullptr;
+
+	M_Dynamic = Progress_Image->GetDynamicMaterial();
 	
+}
+
+void UStaminaBar::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+
 	Link = Cast<ALink>(GetOwningPlayerPawn());
 	if(Link != nullptr)
 	{
@@ -27,10 +37,9 @@ void UStaminaBar::NativeConstruct()
 			}
 		});
 	}
-
 	
-
 }
+
 
 void UStaminaBar::NativeTick(const FGeometry& MovieSceneBlends, float InDeltaTime)
 {
@@ -38,7 +47,7 @@ void UStaminaBar::NativeTick(const FGeometry& MovieSceneBlends, float InDeltaTim
 	
 	if(Link != nullptr)
 	{
-		UMaterialInstanceDynamic* M_Dynamic = Progress_Image->GetDynamicMaterial();
+		
 		
 		if (StaminaState == EStaminaState::DEPLETION)
 		{

@@ -21,6 +21,9 @@ ALink::ALink()
 
 	Stamina = 100.0f;
 	MaxStamina = 100.0f;
+	HP = 12;
+	MaxHP = 12;
+	
 	bRunning = false;
 	bStaminaRegen = false;
 	StaminaState = EStaminaState::DEFAULT;
@@ -38,6 +41,11 @@ void ALink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(TEXT("Jump"),EInputEvent::IE_Pressed,this,&ALink::Jump);
 	PlayerInputComponent->BindAction(TEXT("Run"),EInputEvent::IE_Pressed,this,&ALink::Run);
 	PlayerInputComponent->BindAction(TEXT("Run"),EInputEvent::IE_Released,this,&ALink::RunStop);
+
+
+	//디버그
+	PlayerInputComponent->BindAction(TEXT("Debug1"),EInputEvent::IE_Pressed,this,&ALink::Debug1);
+	PlayerInputComponent->BindAction(TEXT("Debug2"),EInputEvent::IE_Pressed,this,&ALink::Debug2);
 }
 
 void ALink::Tick(float DeltaSeconds)
@@ -112,6 +120,16 @@ float ALink::GetMaxStamina() const
 	return MaxStamina;
 }
 
+int32 ALink::GetHP() const
+{
+	return HP;
+}
+
+int32 ALink::GetMaxHP() const
+{
+	return MaxHP;
+}
+
 EStaminaState ALink::GetStaminaState() const
 {
 	return StaminaState;
@@ -151,3 +169,26 @@ void ALink::StopRegen()
 	GetWorld()->GetTimerManager().ClearTimer(WaitStaminaRegenTimer);
 }
 
+void ALink::SetMaxHP(int32 newMaxHP)
+{
+	if(newMaxHP > 0) MaxHP = newMaxHP;
+	if(HP > MaxHP) HP = MaxHP;
+
+	if(OnHPChanged.IsBound()) OnHPChanged.Broadcast();
+}
+void ALink::SetHP(int newHP)
+{
+	HP = FMath::Clamp(newHP,0,GetMaxHP());
+	if(OnHPChanged.IsBound()) OnHPChanged.Broadcast();
+}
+
+
+void ALink::Debug1()
+{
+	SetHP(GetHP() + 1);
+}
+
+void ALink::Debug2()
+{
+	SetHP(GetHP() - 1);
+}

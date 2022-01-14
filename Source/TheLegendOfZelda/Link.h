@@ -17,6 +17,7 @@ enum class EStaminaState : uint8
 };
 
 DECLARE_MULTICAST_DELEGATE(FOnStaminaStateChanged);
+DECLARE_MULTICAST_DELEGATE(FOnHPChangedged);
 
 UCLASS()
 class THELEGENDOFZELDA_API ALink : public ACharacterBase
@@ -26,9 +27,13 @@ class THELEGENDOFZELDA_API ALink : public ACharacterBase
 public:
 	
 	FOnStaminaStateChanged StaminaStateChanged;
+	FOnHPChangedged OnHPChanged;
 private:
 	float Stamina;
 	float MaxStamina;
+	int32 HP;
+	int32 MaxHP;
+	
 	bool bRunning;
 	bool bStaminaRegen;
 	FTimerHandle WaitStaminaRegenTimer = {};
@@ -55,8 +60,14 @@ public:
 	
 	float GetStamina() const;
 	float GetMaxStamina() const;
+	int32 GetHP() const;
+	int32 GetMaxHP() const;
 	EStaminaState GetStaminaState() const;
 	void SetStaminaState(EStaminaState NewState);
 	void DoRegen();
 	void StopRegen();
+	void SetMaxHP(int32 newMaxHP);
+	void SetHP(int newHP);
+	void Debug1();
+	void Debug2();
 };

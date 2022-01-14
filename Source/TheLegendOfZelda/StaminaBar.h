@@ -24,6 +24,9 @@ class THELEGENDOFZELDA_API UStaminaBar : public UUserWidget
 	FLinearColor DepletionColor;		// 스테미나 고갈 혹은 사용중일때 표시되는 색 ( 빨간색 ~ 주황색 으로 천천히 변화 )
 	bool bDepletionColor_incr;
 
+	UPROPERTY()
+	UMaterialInstanceDynamic* M_Dynamic;
+	
 	EStaminaState StaminaState;
 
 	UPROPERTY()
@@ -32,6 +35,7 @@ class THELEGENDOFZELDA_API UStaminaBar : public UUserWidget
 	public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 	
 	
